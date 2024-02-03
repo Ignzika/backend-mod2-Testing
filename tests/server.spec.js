@@ -33,26 +33,22 @@ describe('CRUD from "Cafeteria Nanacao" operations', () => {
     });
   });
 
-    describe("GET ID /cafes/:id", () => {
-        const items = 8 //number of items to check
+  describe("GET ID /cafes/:id", () => {
+    const items = 8; //number of items to check
     for (let i = 1; i <= items; i++) {
-       const ID = i
-        it("Should return code 200", async () => {
-            const response = await request(app).get(`/cafes/${ID}`).send();
+      const ID = i;
+      it("Should return code 200", async () => {
+        const response = await request(app).get(`/cafes/${ID}`).send();
 
-            if (response.status === 200) {
-                
-                expect(response.status).toBe(200);
-            } else {
-                expect(response.status).toBe(404);
-            }
-            });
-           
-        } 
-          
+        if (response.status === 200) {
+          expect(response.status).toBe(200);
+        } else {
+          expect(response.status).toBe(404);
+        }
+      });
+    }
   });
-    
-    
+
   describe("POST /cafes", () => {
     const newCoffe = {
       id: 99,
@@ -75,31 +71,28 @@ describe('CRUD from "Cafeteria Nanacao" operations', () => {
       // console.log(response);
       expect(JSON.parse(response.text)).toContainEqual(newCoffe);
     });
-      
-      //bad data
-      
-      it("Create post with bad data", async () => {
-        const badCoffe = {
-            id: 4+4*12,
-            nombre: 4 ,
-          };
-          const response = await request(app).post("/cafes").send(badCoffe);
-          console.log(response.body)
-          expect(response.status).toBe(400); // no validation for bad data, still post the number
-          
-      });
 
-      it("Create post with same id", async () => {
-        const exist = {
-            id: 1,
-            nombre: "Cortado",
-          };
-          
-        const response = await request(app).post("/cafes").send(exist);
-        expect(response.status).toBe(400);
-        
+    //bad data
+
+    it("Create post with bad data", async () => {
+      const badCoffe = {
+        id: 4 + 4 * 12,
+        nombre: 4,
+      };
+      const response = await request(app).post("/cafes").send(badCoffe);
+      console.log(response.body);
+      expect(response.status).toBe(400); // no validation for bad data, still post the number
     });
-      
+
+    it("Create post with same id", async () => {
+      const exist = {
+        id: 1,
+        nombre: "Cortado",
+      };
+
+      const response = await request(app).post("/cafes").send(exist);
+      expect(response.status).toBe(400);
+    });
   });
 
   describe("PUT /cafes/:id", () => {
@@ -120,27 +113,27 @@ describe('CRUD from "Cafeteria Nanacao" operations', () => {
       // console.log(updateResponse);
       expect(updateResponse.status).toBe(200);
     });
-      //bad data
+    //bad data
 
-      it("ID for update not found", async () => {
-          const response = await request(app).post(`/cafes`).send(newCoffe);
-          
-        const putBadIDCoffe = {
-          id: newCoffe.id +5,
-          nombre: "Updated Decaffeinated",
-        };
-        const updateResponse = await request(app)
-          .put(`/cafes/${newCoffe.id}`)
-          .send(putBadIDCoffe);
-        // console.log(updateResponse);
-        expect(updateResponse.status).toBe(400);
-      });
+    it("ID for update not found", async () => {
+      const response = await request(app).post(`/cafes`).send(newCoffe);
 
-      it("Updating a non existing ID", async () => {
-        const response = await request(app).post(`/cafes`).send(newCoffe);
-        
       const putBadIDCoffe = {
-        id: 959595*1000,
+        id: newCoffe.id + 5,
+        nombre: "Updated Decaffeinated",
+      };
+      const updateResponse = await request(app)
+        .put(`/cafes/${newCoffe.id}`)
+        .send(putBadIDCoffe);
+      // console.log(updateResponse);
+      expect(updateResponse.status).toBe(400);
+    });
+
+    it("Updating a non existing ID", async () => {
+      const response = await request(app).post(`/cafes`).send(newCoffe);
+
+      const putBadIDCoffe = {
+        id: 959595 * 1000,
         nombre: "Updated Decaffeinated",
       };
       const updateResponse = await request(app)
@@ -148,12 +141,7 @@ describe('CRUD from "Cafeteria Nanacao" operations', () => {
         .send(putBadIDCoffe);
       // console.log(updateResponse);
       expect(updateResponse.status).toBe(404);
-      });
-      
-
-      
-
-
+    });
   });
 
   describe("DELETE /cafes/:id", () => {
@@ -193,45 +181,40 @@ describe('CRUD from "Cafeteria Nanacao" operations', () => {
         id: 999,
         nombre: "Original Decaf",
       };
-      const response = await request(app)
-        .post(`/cafes`)
-        .send(newCoffe);
+      const response = await request(app).post(`/cafes`).send(newCoffe);
 
       const deleteResponse = await request(app)
         .delete(`/cafes/${otherCoffe.id}`)
         .send();
       expect(deleteResponse.status).toBe(400);
     });
-      
+
     it("Send Error on bad token", async () => {
-        const otherCoffe = {
-          id: 999,
-          nombre: "Original Decaf",
-        };
-        const token = "thisisatoken";
-        const badToken = "something";
-        const response = await request(app)
-          .post(`/cafes`)
-          .set("Authorization", `Bearer ${token}`)
-          .send(newCoffe);
-  
-        const deleteResponse = await request(app)
-          .delete(`/cafes/${otherCoffe.id}`)
-          .set("Authorization", `Bearer ${badToken}`)
-          .send();
-        // console.log(deleteResponse.status)
-        expect(deleteResponse.status).toBe(400 || 498); // bad use of token on code
-      });
-      
-      
+      const otherCoffe = {
+        id: 999,
+        nombre: "Original Decaf",
+      };
+      const token = "thisisatoken";
+      const badToken = "something";
+      const response = await request(app)
+        .post(`/cafes`)
+        .set("Authorization", `Bearer ${token}`)
+        .send(newCoffe);
+
+      const deleteResponse = await request(app)
+        .delete(`/cafes/${otherCoffe.id}`)
+        .set("Authorization", `Bearer ${badToken}`)
+        .send();
+      // console.log(deleteResponse.status)
+      expect(deleteResponse.status).toBe(400 || 498); // bad use of token on code
+    });
   });
-    
-    describe("Not Found route",  () => {
-        it("Status Code 404 on non existent routes", async () => {
-            const response = await request(app).get("/bad").send();
 
-            expect(response.status).toBe(404);
-        });
+  describe("Not Found route", () => {
+    it("Status Code 404 on non existent routes", async () => {
+      const response = await request(app).get("/bad").send();
 
-    })
+      expect(response.status).toBe(404);
+    });
+  });
 });
